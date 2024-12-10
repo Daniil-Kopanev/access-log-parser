@@ -13,12 +13,10 @@ public class Main {
             if (fileExists == false || isDirectory == true) {
                 System.out.println("Введен несуществующий путь до файла или путь ведет до папки\n");
                 continue;
-            } else {
-                System.out.println("Путь указан верно");
-                System.out.println("Это файл номер " + count + "\n");
-                count++;
-                continue;
             }
+            System.out.println("Путь указан верно");
+            System.out.println("Это файл номер " + count + "\n");
+            count++;
         }
     }
 }
