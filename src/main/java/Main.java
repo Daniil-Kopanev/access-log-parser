@@ -1,5 +1,4 @@
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -9,8 +8,8 @@ public class Main {
         int countLine = 0;
         int countGoogle = 0;
         int countYandex = 0;
-
-        String ipAddress, date, pathRequest, requestCode, sizeData, pathUrl, userAgent;
+        String userAgent;
+        Statistics statistics = new Statistics();
 
         while (true) {
             System.out.println("Введите путь до файла:");
@@ -33,14 +32,9 @@ public class Main {
                         throw new MaxLengthLineException("Maximum line length exceeded 1024");
                     }
                     countLine++;
-                    List<String> l = new ArrayList<String>();
-                    l = List.of(line.split(" "));
-                    ipAddress = l.get(0);
-                    date = l.get(3) + l.get(4);
-                    pathRequest = l.get(5) + l.get(6);
-                    requestCode = l.get(8);
-                    sizeData = l.get(9);
-                    pathUrl = l.get(10);
+                    LogEntry lg = new LogEntry(line);
+                    statistics.addEntry(lg);
+                    List<String> l = List.of(line.split(" "));
                     userAgent = "";
                     if (!l.get(11).equals("\"-\"")) {
                         for (int i = 0; i < l.size() - 11; i++) {
@@ -62,7 +56,8 @@ public class Main {
                                 }
                             }
                         }
-                    } catch (IndexOutOfBoundsException ignored) {}
+                    } catch (IndexOutOfBoundsException ignored) {
+                    }
                 }
             } catch (MaxLengthLineException ex) {
                 System.out.println(ex);
@@ -74,9 +69,15 @@ public class Main {
             System.out.println("Это файл номер " + count);
             count++;
             System.out.println("Общее количество строк в файле: " + countLine);
+            System.out.println("Средний объём трафика за час: " + statistics.getTrafficRate() + " Кбайт/ч");
             System.out.println("Доля запросов от Googlebot: " + (double) countGoogle / countLine);
             System.out.println("Доля запросов от YandexBot : " + (double) countYandex / countLine);
             System.out.println("-----------------------------------------------------------");
+            // удаление данных по текущему файлу
+            statistics.clear();
+            countLine = 0;
+            countGoogle = 0;
+            countYandex = 0;
         }
     }
 }
