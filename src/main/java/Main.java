@@ -72,6 +72,8 @@ public class Main {
             System.out.println("Средний объём трафика за час: " + statistics.getTrafficRate() + " Кбайт/ч");
             System.out.println("Доля запросов от Googlebot: " + (double) countGoogle / countLine);
             System.out.println("Доля запросов от YandexBot : " + (double) countYandex / countLine);
+            System.out.println("Список существующий страниц сайта: " + statistics.getAllExistPages());
+            System.out.println("Доли запросов от разный ОС: " + statistics.getStatisticsOs());
             System.out.println("-----------------------------------------------------------");
             // удаление данных по текущему файлу
             statistics.clear();

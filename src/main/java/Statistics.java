@@ -1,10 +1,14 @@
 import java.time.LocalDateTime;
+import java.util.*;
 
 public class Statistics {
 
     private int totalTraffic = 0;
     private LocalDateTime minTime;
     private LocalDateTime maxTime;
+    HashSet<String> allPages = new HashSet<>();
+    HashMap<String, Integer> occurrenceOs = new HashMap<>();
+    HashMap<String, Double> fractionOs = new HashMap<>();
 
     public Statistics() {
     }
@@ -38,6 +42,35 @@ public class Statistics {
                 this.maxTime = logEntry.getTime();
             }
         }
+
+        if (logEntry.getResponseCode() == 200) {
+            this.allPages.add(logEntry.getPathUrl());
+        }
+
+        if (!(logEntry.getUserAgent().getTypeOs().equals("-"))) {
+            if (occurrenceOs.containsKey(logEntry.getUserAgent().getTypeOs())) {
+                occurrenceOs.put(logEntry.getUserAgent().getTypeOs(), occurrenceOs.get(logEntry.getUserAgent().getTypeOs()) + 1);
+            } else occurrenceOs.put(String.valueOf(logEntry.getUserAgent().getTypeOs()), 1);
+        }
+    }
+
+    public HashMap<String, Double> getStatisticsOs() {
+        Integer countRequest = 0;
+        for (Map.Entry<String, Integer> entry : occurrenceOs.entrySet()) {
+            countRequest += entry.getValue();
+        }
+        for (Map.Entry<String, Integer> entry : occurrenceOs.entrySet()) {
+            fractionOs.put(entry.getKey(), entry.getValue().doubleValue() / countRequest.doubleValue());
+        }
+        return fractionOs;
+    }
+
+    public ArrayList<String> getAllExistPages() {
+        List<String> pages = new ArrayList<>();
+        for (String allPage : allPages) {
+            pages.add(allPage);
+        }
+        return new ArrayList<>(pages);
     }
 
     public int getTrafficRate() {
@@ -61,5 +94,8 @@ public class Statistics {
         this.totalTraffic = 0;
         this.maxTime = null;
         this.minTime = null;
+        this.allPages.clear();
+        this.occurrenceOs.clear();
+        this.fractionOs.clear();
     }
 }
