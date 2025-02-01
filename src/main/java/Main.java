@@ -74,6 +74,8 @@ public class Main {
             System.out.println("Доля запросов от YandexBot : " + (double) countYandex / countLine);
             System.out.println("Список существующий страниц сайта: " + statistics.getAllExistPages());
             System.out.println("Доли запросов от разный ОС: " + statistics.getStatisticsOs());
+            System.out.println("Список несуществующий страниц сайта: " + statistics.getNonExistPages());
+            System.out.println("Доли запросов от разных браузеров: " + statistics.getStatisticsBrow());
             System.out.println("-----------------------------------------------------------");
             // удаление данных по текущему файлу
             statistics.clear();
