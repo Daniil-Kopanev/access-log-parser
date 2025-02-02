@@ -2,6 +2,7 @@ public class UserAgent {
 
     final String typeBrowser;
     final String typeOs;
+    final boolean isBot;
 
     public UserAgent(String userAgent) {
         String s;
@@ -32,6 +33,7 @@ public class UserAgent {
             }
             this.typeOs = String.valueOf(TypeOs.forValue(s2));
         }
+        this.isBot = isBot(userAgent);
     }
 
     public String getTypeOs() {
@@ -85,6 +87,15 @@ public class UserAgent {
         }
     }
 
+    private boolean isBot(String userAgent) {
+        if (getTypeBrowser().equals("-")) {
+            return false;
+        } else return userAgent.contains("bot");
+    }
+
+    public boolean isBot() {
+        return isBot;
+    }
 }
 
 

@@ -1,13 +1,17 @@
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.*;
 
 public class Statistics {
 
     private int totalTraffic = 0;
+    private int countVisits = 0;
+    private int countErrors = 0;
     private LocalDateTime minTime;
     private LocalDateTime maxTime;
     private HashSet<String> allPages = new HashSet<>();
     private HashSet<String> nonExistPages = new HashSet<>();
+    private HashSet<String> ipRealUsers = new HashSet<>();
     private HashMap<String, Integer> occurrenceOs = new HashMap<>();
     private HashMap<String, Integer> occurrenceBrow = new HashMap<>();
     private HashMap<String, Double> fractionOs = new HashMap<>();
@@ -29,7 +33,9 @@ public class Statistics {
     }
 
     public void addEntry(LogEntry logEntry) {
-        this.totalTraffic += logEntry.getResponseSize() / 1000; // переводим байты в Кбайты, т.к. общая сумма не помещается в int
+
+        this.totalTraffic += logEntry.getResponseSize() / 1024; // переводим байты в Кбайты, т.к. общая сумма не помещается в int
+
         if (minTime == null) {
             this.minTime = logEntry.getTime();
         } else {
@@ -63,6 +69,15 @@ public class Statistics {
             if (occurrenceBrow.containsKey(logEntry.getUserAgent().getTypeBrowser())) {
                 occurrenceBrow.put(logEntry.getUserAgent().getTypeBrowser(), occurrenceBrow.get(logEntry.getUserAgent().getTypeBrowser()) + 1);
             } else occurrenceBrow.put(String.valueOf(logEntry.getUserAgent().getTypeBrowser()), 1);
+        }
+
+        if (!logEntry.getUserAgent().isBot()) {
+            countVisits++;
+            this.ipRealUsers.add(logEntry.getIpAddr());
+        }
+
+        if (Integer.toString(logEntry.getResponseCode()).charAt(0) == '4' || Integer.toString(logEntry.getResponseCode()).charAt(0) == '5') {
+            countErrors++;
         }
     }
 
@@ -106,20 +121,45 @@ public class Statistics {
     }
 
     public int getTrafficRate() {
+        int hour = getAmountHours();
+        return totalTraffic / hour;
+    }
 
+    public int getAvgCountVisits() {
+        int hour = getAmountHours();
+        return countVisits / hour;
+    }
+
+    public int getAvgCountErrors() {
+        int hour = getAmountHours();
+        return countErrors / hour;
+    }
+
+    public int getAvgVisitsOneUser() {
+        return countVisits / ipRealUsers.size();
+    }
+
+    private int getAmountHours() {
         int hour = 0;
-        if (maxTime.getDayOfMonth() > minTime.getDayOfMonth()) {
+        if (maxTime.getMonth().getValue() > minTime.getMonth().getValue()) {
+            int countDaysMonthMin = YearMonth.of(minTime.getYear(), minTime.getMonth().getValue()).lengthOfMonth();
+            int countFullDays = countDaysMonthMin - minTime.getDayOfMonth() + maxTime.getDayOfMonth() - 2; // количество полных дней
+            hour += countFullDays * 24;
+            hour += 24 - minTime.getHour() + maxTime.getHour();
+        } else if (maxTime.getDayOfMonth() > minTime.getDayOfMonth()) {
             int diffDay = maxTime.getDayOfMonth() - minTime.getDayOfMonth();
             if (diffDay == 1) {
-                hour = 24 - minTime.getHour() + maxTime.getHour();
+                hour += 24 - minTime.getHour() + maxTime.getHour();
             }
             if (diffDay > 1) {
-                hour = 24 - minTime.getHour() + maxTime.getHour() + 24 * (diffDay - 1);
+                hour += 24 - minTime.getHour() + maxTime.getHour() + 24 * (diffDay - 1);
             }
         } else {
-            hour = maxTime.getHour() - minTime.getHour();
+            if (maxTime.getHour() - minTime.getHour() == 0) {
+                hour += 1;
+            } else hour += maxTime.getHour() - minTime.getHour();
         }
-        return totalTraffic / hour;
+        return hour;
     }
 
     public void clear() {
@@ -127,10 +167,13 @@ public class Statistics {
         this.maxTime = null;
         this.minTime = null;
         this.allPages.clear();
+        this.ipRealUsers.clear();
         this.occurrenceOs.clear();
         this.fractionOs.clear();
         this.nonExistPages.clear();
         this.occurrenceBrow.clear();
         this.fractionBrow.clear();
+        this.countVisits = 0;
+        this.countErrors = 0;
     }
 }

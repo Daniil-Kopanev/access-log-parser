@@ -64,6 +64,7 @@ public class Main {
                 System.exit(0);
             } catch (Exception ex) {
                 ex.printStackTrace();
+                System.exit(0);
             }
             System.out.println("Путь указан верно");
             System.out.println("Это файл номер " + count);
@@ -76,6 +77,9 @@ public class Main {
             System.out.println("Доли запросов от разный ОС: " + statistics.getStatisticsOs());
             System.out.println("Список несуществующий страниц сайта: " + statistics.getNonExistPages());
             System.out.println("Доли запросов от разных браузеров: " + statistics.getStatisticsBrow());
+            System.out.println("Среднее количество посещений за час: " + statistics.getAvgCountVisits());
+            System.out.println("Среднее количество ошибок за час: " + statistics.getAvgCountErrors());
+            System.out.println("Среднее количество посещений одним пользователом за час: " + statistics.getAvgVisitsOneUser());
             System.out.println("-----------------------------------------------------------");
             // удаление данных по текущему файлу
             statistics.clear();
