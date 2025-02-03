@@ -73,10 +73,10 @@ public class Main {
             System.out.println("Средний объём трафика за час: " + statistics.getTrafficRate() + " Кбайт/ч");
             System.out.println("Доля запросов от Googlebot: " + (double) countGoogle / countLine);
             System.out.println("Доля запросов от YandexBot : " + (double) countYandex / countLine);
-            System.out.println("Список существующий страниц сайта: " + statistics.getAllExistPages());
+//            System.out.println("Список существующий страниц сайта: " + statistics.getAllExistPages());
             System.out.println("Доли запросов от разный ОС: " + statistics.getStatisticsOs());
-            System.out.println("Список несуществующий страниц сайта: " + statistics.getNonExistPages());
-            System.out.println("Доли запросов от разных браузеров: " + statistics.getStatisticsBrow());
+//            System.out.println("Список несуществующий страниц сайта: " + statistics.getNonExistPages());
+            System.out.println("Доли запросов от разных браузеров: " + statistics.getStatisticsBrowser());
             System.out.println("Среднее количество посещений за час: " + statistics.getAvgCountVisits());
             System.out.println("Среднее количество ошибок за час: " + statistics.getAvgCountErrors());
             System.out.println("Среднее количество посещений одним пользователом за час: " + statistics.getAvgVisitsOneUser());

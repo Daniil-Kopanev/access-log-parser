@@ -13,9 +13,9 @@ public class Statistics {
     private HashSet<String> nonExistPages = new HashSet<>();
     private HashSet<String> ipRealUsers = new HashSet<>();
     private HashMap<String, Integer> occurrenceOs = new HashMap<>();
-    private HashMap<String, Integer> occurrenceBrow = new HashMap<>();
+    private HashMap<String, Integer> occurrenceBrowser = new HashMap<>();
     private HashMap<String, Double> fractionOs = new HashMap<>();
-    private HashMap<String, Double> fractionBrow = new HashMap<>();
+    private HashMap<String, Double> fractionBrowser = new HashMap<>();
 
     public Statistics() {
     }
@@ -53,10 +53,10 @@ public class Statistics {
         }
 
         if (logEntry.getResponseCode() == 200) {
-            this.allPages.add(logEntry.getPathUrl());
+            this.allPages.add(logEntry.getPath());
         }
         if (logEntry.getResponseCode() == 404) {
-            this.nonExistPages.add(logEntry.getPathUrl());
+            this.nonExistPages.add(logEntry.getPath());
         }
 
         if (!(logEntry.getUserAgent().getTypeOs().equals("-"))) {
@@ -66,9 +66,9 @@ public class Statistics {
         }
 
         if (!(logEntry.getUserAgent().getTypeBrowser().equals("-"))) {
-            if (occurrenceBrow.containsKey(logEntry.getUserAgent().getTypeBrowser())) {
-                occurrenceBrow.put(logEntry.getUserAgent().getTypeBrowser(), occurrenceBrow.get(logEntry.getUserAgent().getTypeBrowser()) + 1);
-            } else occurrenceBrow.put(String.valueOf(logEntry.getUserAgent().getTypeBrowser()), 1);
+            if (occurrenceBrowser.containsKey(logEntry.getUserAgent().getTypeBrowser())) {
+                occurrenceBrowser.put(logEntry.getUserAgent().getTypeBrowser(), occurrenceBrowser.get(logEntry.getUserAgent().getTypeBrowser()) + 1);
+            } else occurrenceBrowser.put(String.valueOf(logEntry.getUserAgent().getTypeBrowser()), 1);
         }
 
         if (!logEntry.getUserAgent().isBot()) {
@@ -82,41 +82,31 @@ public class Statistics {
     }
 
     public HashMap<String, Double> getStatisticsOs() {
-        Integer countRequest = 0;
-        for (Map.Entry<String, Integer> entry : occurrenceOs.entrySet()) {
-            countRequest += entry.getValue();
-        }
-        for (Map.Entry<String, Integer> entry : occurrenceOs.entrySet()) {
-            fractionOs.put(entry.getKey(), entry.getValue().doubleValue() / countRequest.doubleValue());
-        }
-        return fractionOs;
+        return getStatisticsHashMap(occurrenceOs, fractionOs);
     }
 
-    public HashMap<String, Double> getStatisticsBrow() {
-        Integer countRequest = 0;
-        for (Map.Entry<String, Integer> entry : occurrenceBrow.entrySet()) {
-            countRequest += entry.getValue();
-        }
-        for (Map.Entry<String, Integer> entry : occurrenceBrow.entrySet()) {
-            fractionBrow.put(entry.getKey(), entry.getValue().doubleValue() / countRequest.doubleValue());
+    public HashMap<String, Double> getStatisticsBrowser() {
+        return getStatisticsHashMap(occurrenceBrowser, fractionBrowser);
+    }
 
+    private HashMap<String, Double> getStatisticsHashMap(HashMap<String, Integer> occurrence, HashMap<String, Double> fraction) {
+        Integer countRequest = 0;
+        for (Integer value : occurrence.values()) {
+            countRequest += value;
         }
-        return fractionBrow;
+        for (Map.Entry<String, Integer> entry : occurrence.entrySet()) {
+            fraction.put(entry.getKey(), entry.getValue().doubleValue() / countRequest.doubleValue());
+        }
+        return fraction;
     }
 
     public ArrayList<String> getAllExistPages() {
-        List<String> pages = new ArrayList<>();
-        for (String page : allPages) {
-            pages.add(page);
-        }
+        List<String> pages = new ArrayList<>(allPages);
         return new ArrayList<>(pages);
     }
 
     public ArrayList<String> getNonExistPages() {
-        List<String> pages = new ArrayList<>();
-        for (String page : nonExistPages) {
-            pages.add(page);
-        }
+        List<String> pages = new ArrayList<>(nonExistPages);
         return new ArrayList<>(pages);
     }
 
@@ -171,8 +161,8 @@ public class Statistics {
         this.occurrenceOs.clear();
         this.fractionOs.clear();
         this.nonExistPages.clear();
-        this.occurrenceBrow.clear();
-        this.fractionBrow.clear();
+        this.occurrenceBrowser.clear();
+        this.fractionBrowser.clear();
         this.countVisits = 0;
         this.countErrors = 0;
     }
