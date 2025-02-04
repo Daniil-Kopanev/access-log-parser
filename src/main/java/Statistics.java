@@ -1,6 +1,7 @@
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Statistics {
 
@@ -12,10 +13,13 @@ public class Statistics {
     private HashSet<String> allPages = new HashSet<>();
     private HashSet<String> nonExistPages = new HashSet<>();
     private HashSet<String> ipRealUsers = new HashSet<>();
+    private HashSet<String> domains = new HashSet<>();
     private HashMap<String, Integer> occurrenceOs = new HashMap<>();
     private HashMap<String, Integer> occurrenceBrowser = new HashMap<>();
     private HashMap<String, Double> fractionOs = new HashMap<>();
     private HashMap<String, Double> fractionBrowser = new HashMap<>();
+    private HashMap<Integer, Integer> countRequestPerSec = new HashMap<>();
+    private HashMap<String, Integer> countVisitsRealUsers = new HashMap<>();
 
     public Statistics() {
     }
@@ -74,10 +78,31 @@ public class Statistics {
         if (!logEntry.getUserAgent().isBot()) {
             countVisits++;
             this.ipRealUsers.add(logEntry.getIpAddr());
+
+            ArrayList<String> uniqueCodeSec = new ArrayList<>(Arrays.asList(
+                    Integer.toString(logEntry.getTime().getMonth().getValue()),
+                    Integer.toString(logEntry.getTime().getDayOfMonth()),
+                    Integer.toString(logEntry.getTime().getHour()),
+                    Integer.toString(logEntry.getTime().getMinute()),
+                    Integer.toString(logEntry.getTime().getSecond())
+            ));
+            Integer secCode = Integer.parseInt(uniqueCodeSec.stream().collect(Collectors.joining()));
+            if (countRequestPerSec.containsKey(secCode)) {
+                this.countRequestPerSec.put(secCode, countRequestPerSec.get(secCode) + 1);
+            } else this.countRequestPerSec.put(secCode, 1);
+
+            if (countVisitsRealUsers.containsKey(logEntry.getIpAddr())) {
+                countVisitsRealUsers.put(logEntry.getIpAddr(), countVisitsRealUsers.get(logEntry.getIpAddr()) + 1);
+            } else countVisitsRealUsers.put(logEntry.getIpAddr(), 1);
         }
 
         if (Integer.toString(logEntry.getResponseCode()).charAt(0) == '4' || Integer.toString(logEntry.getResponseCode()).charAt(0) == '5') {
             countErrors++;
+        }
+
+        if (!logEntry.getReferer().equals("-") && logEntry.getReferer().contains("https://")) {
+            String referer = logEntry.getReferer().replaceAll("https://", "");
+            this.domains.add(referer.substring(0, referer.indexOf('/')));
         }
     }
 
@@ -152,6 +177,19 @@ public class Statistics {
         return hour;
     }
 
+    public int getMaxCountRequestPerSec() {
+        return countRequestPerSec.values().stream().mapToInt(sec -> sec).max().orElse(0);
+    }
+
+    public ArrayList<String> getWebsiteWithLinksCurrentSite() {
+        List<String> pages = new ArrayList<>(domains);
+        return new ArrayList<>(pages);
+    }
+
+    public int getMaxCountVisitsRealUser() {
+        return countVisitsRealUsers.values().stream().mapToInt(countRequests -> countRequests).max().orElse(0);
+    }
+
     public void clear() {
         this.totalTraffic = 0;
         this.maxTime = null;
@@ -163,6 +201,9 @@ public class Statistics {
         this.nonExistPages.clear();
         this.occurrenceBrowser.clear();
         this.fractionBrowser.clear();
+        this.countRequestPerSec.clear();
+        this.domains.clear();
+        this.countVisitsRealUsers.clear();
         this.countVisits = 0;
         this.countErrors = 0;
     }

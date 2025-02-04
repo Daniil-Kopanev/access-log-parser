@@ -80,6 +80,9 @@ public class Main {
             System.out.println("Среднее количество посещений за час: " + statistics.getAvgCountVisits());
             System.out.println("Среднее количество ошибок за час: " + statistics.getAvgCountErrors());
             System.out.println("Среднее количество посещений одним пользователом за час: " + statistics.getAvgVisitsOneUser());
+            System.out.println("Максимально количество запросов в секунду: " + statistics.getMaxCountRequestPerSec());
+            System.out.println("Список сайтов, со страниц которых есть ссылки на текущий сайт: " + statistics.getWebsiteWithLinksCurrentSite());
+            System.out.println("Максимально количество посещений одним из пользователей: " + statistics.getMaxCountVisitsRealUser());
             System.out.println("-----------------------------------------------------------");
             // удаление данных по текущему файлу
             statistics.clear();
